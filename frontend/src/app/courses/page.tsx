@@ -32,7 +32,8 @@ export default function CoursesPage() {
   const [filter, setFilter] = useState({
     category: 'all',
     level: 'all',
-    search: ''
+    search: '',
+    sortBy: 'popular'
   });
 
   useEffect(() => {
@@ -56,14 +57,31 @@ export default function CoursesPage() {
     }
   };
 
-  const filteredCourses = courses.filter(course => {
-    const matchesCategory = filter.category === 'all' || course.category === filter.category;
-    const matchesLevel = filter.level === 'all' || course.level === filter.level;
-    const matchesSearch = course.title.toLowerCase().includes(filter.search.toLowerCase()) ||
-                         course.description.toLowerCase().includes(filter.search.toLowerCase());
-    
-    return matchesCategory && matchesLevel && matchesSearch;
-  });
+  const filteredCourses = courses
+    .filter(course => {
+      const matchesCategory = filter.category === 'all' || course.category === filter.category;
+      const matchesLevel = filter.level === 'all' || course.level === filter.level;
+      const matchesSearch = course.title.toLowerCase().includes(filter.search.toLowerCase()) ||
+                           course.description.toLowerCase().includes(filter.search.toLowerCase());
+      
+      return matchesCategory && matchesLevel && matchesSearch;
+    })
+    .sort((a, b) => {
+      switch (filter.sortBy) {
+        case 'popular':
+          return b.totalStudents - a.totalStudents;
+        case 'rating':
+          return b.rating - a.rating;
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'newest':
+          return 0; // Would need createdAt field
+        default:
+          return 0;
+      }
+    });
 
   const categories = ['all', ...Array.from(new Set(courses.map(c => c.category)))];
   const levels = ['all', 'BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
@@ -101,11 +119,11 @@ export default function CoursesPage() {
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Search Courses
+                🔍 Search Courses
               </label>
               <input
                 type="text"
@@ -120,7 +138,7 @@ export default function CoursesPage() {
             {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
+                📂 Category
               </label>
               <select
                 value={filter.category}
@@ -139,7 +157,7 @@ export default function CoursesPage() {
             {/* Level Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Level
+                📊 Level
               </label>
               <select
                 value={filter.level}
@@ -154,6 +172,33 @@ export default function CoursesPage() {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Sort By */}
+          <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700">Sort by:</span>
+              <select
+                value={filter.sortBy}
+                data-qa="courses-sort-select"
+                onChange={(e) => setFilter({ ...filter, sortBy: e.target.value })}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="rating">Highest Rated</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+            
+            {(filter.search || filter.category !== 'all' || filter.level !== 'all') && (
+              <button
+                onClick={() => setFilter({ category: 'all', level: 'all', search: '', sortBy: 'popular' })}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
 
