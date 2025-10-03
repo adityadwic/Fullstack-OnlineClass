@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import axios from 'axios'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 interface Video {
   id: string
   title: string
@@ -57,7 +59,7 @@ export default function CoursePlayerPage() {
       
       // Fetch course with progress
       const courseResponse = await axios.get(
-        `http://localhost:4000/api/courses/${params.id}`,
+        `${API_BASE_URL}/courses/${params.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -71,7 +73,7 @@ export default function CoursePlayerPage() {
         // Fetch user progress
         try {
           const progressResponse = await axios.get(
-            `http://localhost:4000/api/progress/${params.id}`,
+            `${API_BASE_URL}/progress/${params.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -129,7 +131,7 @@ export default function CoursePlayerPage() {
       const token = localStorage.getItem('token')
 
       const response = await axios.post(
-        `http://localhost:4000/api/progress/${params.id}/video/${currentVideo.id}/complete`,
+        `${API_BASE_URL}/progress/${params.id}/video/${currentVideo.id}/complete`,
         {},
         {
           headers: {

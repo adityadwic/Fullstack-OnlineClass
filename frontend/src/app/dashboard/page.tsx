@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Link from 'next/link'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 interface EnrolledCourse {
   id: string
   enrolledAt: string
@@ -42,7 +44,7 @@ export default function DashboardPage() {
       setLoadingCourses(true)
       const token = localStorage.getItem('token')
       
-      const response = await axios.get('http://localhost:4000/api/courses/my-courses', {
+      const response = await axios.get(`${API_BASE_URL}/courses/my-courses`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

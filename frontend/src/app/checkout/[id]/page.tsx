@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import axios from 'axios'
 import Image from 'next/image'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 interface Course {
   id: string
   title: string
@@ -50,7 +52,7 @@ export default function CheckoutPage() {
   const fetchCourse = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`http://localhost:4000/api/courses/${params.id}`)
+      const response = await axios.get(`${API_BASE_URL}/courses/${params.id}`)
       
       if (response.data.success) {
         setCourse(response.data.data)
@@ -79,7 +81,7 @@ export default function CheckoutPage() {
       
       // Enroll in course after "payment"
       const response = await axios.post(
-        `http://localhost:4000/api/courses/${params.id}/enroll`,
+        `${API_BASE_URL}/courses/${params.id}/enroll`,
         {
           paymentMethod,
           amount: course?.price

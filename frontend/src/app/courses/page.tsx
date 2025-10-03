@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 interface Course {
   id: string;
   title: string;
@@ -40,7 +42,7 @@ export default function CoursesPage() {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:4000/api/courses');
+      const response = await axios.get(`${API_BASE_URL}/courses`);
       
       if (response.data.success) {
         setCourses(response.data.data);
