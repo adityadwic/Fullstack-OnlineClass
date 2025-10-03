@@ -16,9 +16,9 @@ production
 4000
 ```
 
-### 3. DATABASE_URL (Supabase PostgreSQL)
+### 3. DATABASE_URL (Supabase PostgreSQL - Connection Pooling)
 ```
-postgresql://postgres:Admin_123@db.fzvvufqaiywfwfkwllpv.supabase.co:5432/postgres
+postgresql://postgres.fzvvufqaiywfwfkwllpv:Admin_123@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres
 ```
 
 ### 4. JWT_SECRET (Generated - PRODUCTION ONLY)
@@ -75,7 +75,7 @@ your-cloudinary-api-secret
 ```env
 NODE_ENV=production
 PORT=4000
-DATABASE_URL=postgresql://postgres:Admin_123@db.fzvvufqaiywfwfkwllpv.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres.fzvvufqaiywfwfkwllpv:Admin_123@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres
 JWT_SECRET=eacdd885090b6d55dc4f41232a8c0b507f4056e5a9e0749b5c4d31abe26c465d
 JWT_EXPIRES_IN=7d
 ```
