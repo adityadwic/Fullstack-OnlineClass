@@ -12,18 +12,43 @@ const app = express();
 // Connect to PostgreSQL via Prisma
 connectDB();
 
-// CORS Configuration - Allow local and ngrok origins
+// CORS Configuration - Allow multiple origins
+const allowedOrigins = [
+  'http://localhost:4001', 
+  'http://localhost:3000', 
+  'http://192.168.100.120:4001', 
+  'http://127.0.0.1:4001',
+  process.env.FRONTEND_URL, // Production frontend URL from environment
+];
+
+const allowedOriginsRegex = [
+  /\.ngrok-free\.app$/,   // Ngrok URLs
+  /\.ngrok-free\.dev$/,
+  /\.ngrok\.io$/,
+  /\.ngrok\.app$/,
+  /\.vercel\.app$/,       // Vercel production & preview deployments
+  /\.railway\.app$/,      // Railway deployments
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:4001', 
-    'http://localhost:3000', 
-    'http://192.168.100.120:4001', 
-    'http://127.0.0.1:4001',
-    /\.ngrok-free\.app$/,   // Allow all ngrok-free.app URLs
-    /\.ngrok-free\.dev$/,   // Allow all ngrok-free.dev URLs
-    /\.ngrok\.io$/,         // Allow ngrok.io URLs (paid plan)
-    /\.ngrok\.app$/,        // Allow ngrok.app URLs
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Check if origin matches any regex pattern
+    const isAllowedByRegex = allowedOriginsRegex.some(regex => regex.test(origin));
+    if (isAllowedByRegex) {
+      return callback(null, true);
+    }
+
+    // Origin not allowed
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
