@@ -6,7 +6,10 @@ const {
   getMe,
   updateProfile,
   changePassword,
-  logout
+  logout,
+  forgotPassword,
+  validateResetToken,
+  resetPassword
 } = require('../controllers/authControllerPrisma');
 const { auth } = require('../middleware/authPrisma');
 
@@ -71,6 +74,23 @@ const changePasswordValidation = [
     .withMessage('New password must contain at least one uppercase letter, one lowercase letter, and one number')
 ];
 
+// Forgot password validation
+const forgotPasswordValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email')
+];
+
+const resetPasswordValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long')
+];
+
 // Routes
 router.post('/register', registerValidation, register);
 router.post('/login', loginValidation, login);
@@ -78,5 +98,10 @@ router.get('/me', auth, getMe);
 router.put('/profile', auth, updateProfileValidation, updateProfile);
 router.put('/password', auth, changePasswordValidation, changePassword);
 router.post('/logout', auth, logout);
+
+// Forgot & Reset Password Routes
+router.post('/forgot-password', forgotPasswordValidation, forgotPassword);
+router.get('/validate-reset-token/:token', validateResetToken);
+router.post('/reset-password', resetPasswordValidation, resetPassword);
 
 module.exports = router;
