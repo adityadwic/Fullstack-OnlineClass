@@ -103,6 +103,14 @@ export default function Navbar() {
                     </div>
                   </div>
                   
+                  <Link
+                    href="/profile"
+                    data-qa="navbar-profile-link"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  
                   <button
                     onClick={handleLogout}
                     data-qa="navbar-logout-button"
@@ -211,6 +219,13 @@ export default function Navbar() {
                         <p className="text-xs text-gray-500 capitalize">{user.role.toLowerCase()}</p>
                       </div>
                     </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:bg-gray-100 rounded-lg mb-2"
+                    >
+                      Profile Settings
+                    </Link>
                     <button
                       onClick={() => {
                         handleLogout()

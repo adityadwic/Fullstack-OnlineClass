@@ -80,20 +80,29 @@ export default function DashboardPage() {
       {/* Page Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center space-x-4">
-            <div className="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-4 ring-white/30">
-              <span className="text-white font-bold text-2xl">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ring-4 ring-white/30">
+                <span className="text-white font-bold text-2xl">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold mb-1">
+                  Welcome back, {user.name}!
+                </h1>
+                <p className="text-blue-100 capitalize text-lg">
+                  {user.role === 'student' ? 'Student Dashboard' : `${user.role} Dashboard`}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-1">
-                Welcome back, {user.name}!
-              </h1>
-              <p className="text-blue-100 capitalize text-lg">
-                {user.role === 'student' ? 'Student Dashboard' : `${user.role} Dashboard`}
-              </p>
-            </div>
+            <Link
+              href="/profile"
+              className="hidden md:flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+            >
+              <span>⚙️</span>
+              <span className="font-medium">Profile</span>
+            </Link>
           </div>
         </div>
       </div>
