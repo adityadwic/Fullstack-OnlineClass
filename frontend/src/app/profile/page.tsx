@@ -64,8 +64,9 @@ export default function ProfilePage() {
         // Update user context
         window.location.reload();
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update profile');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -112,8 +113,9 @@ export default function ProfilePage() {
           confirmPassword: ''
         });
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to change password');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to change password');
     } finally {
       setLoading(false);
     }
@@ -154,18 +156,18 @@ export default function ProfilePage() {
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className={`absolute bottom-0 right-0 h-6 w-6 rounded-full border-4 border-white ${
-                user.role === 'INSTRUCTOR' ? 'bg-purple-500' : 'bg-green-500'
+                user.role === 'instructor' ? 'bg-purple-500' : 'bg-green-500'
               }`}></div>
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
               <p className="text-gray-600">{user.email}</p>
               <span className={`inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full ${
-                user.role === 'INSTRUCTOR' 
+                user.role === 'instructor' 
                   ? 'bg-purple-100 text-purple-800' 
                   : 'bg-blue-100 text-blue-800'
               }`}>
-                {user.role === 'INSTRUCTOR' ? '👨‍🏫 Instructor' : '🎓 Student'}
+                {user.role === 'instructor' ? '👨‍🏫 Instructor' : '🎓 Student'}
               </span>
             </div>
           </div>
@@ -210,7 +212,7 @@ export default function ProfilePage() {
                     Member Since
                   </label>
                   <p className="text-lg text-gray-900">
-                    {new Date(user.createdAt).toLocaleDateString()}
+                    {new Date().toLocaleDateString()}
                   </p>
                 </div>
               </div>

@@ -2,13 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -27,8 +25,9 @@ export default function ForgotPasswordPage() {
       if (response.data.success) {
         setSuccess(true);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send reset email');
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to send reset email');
     } finally {
       setLoading(false);
     }
@@ -58,10 +57,10 @@ export default function ForgotPasswordPage() {
               Check Your Email
             </h2>
             <p className="text-gray-600 mb-6">
-              We've sent password reset instructions to <strong>{email}</strong>
+              We&apos;ve sent password reset instructions to <strong>{email}</strong>
             </p>
             <p className="text-sm text-gray-500 mb-8">
-              If you don't see the email, check your spam folder or try again.
+              If you don&apos;t see the email, check your spam folder or try again.
             </p>
             <div className="space-y-4">
               <Link
@@ -96,7 +95,7 @@ export default function ForgotPasswordPage() {
             Forgot Password?
           </h2>
           <p className="text-center text-gray-600 mb-8">
-            No worries! Enter your email and we'll send you reset instructions.
+            No worries! Enter your email and we&apos;ll send you reset instructions.
           </p>
         </div>
 
