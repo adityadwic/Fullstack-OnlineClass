@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(STUDENT)
+  avatar      String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  courses         Course[]         @relation("UserCourses")
+  enrollments     Enrollment[]
+  progress        Progress[]
+  reviews         Review[]
+  quizAttempts    QuizAttempt[]
+  createdCourses  Course[]         @relation("CourseInstructor")
+
+  @@map("users")
+}
+
+model Course {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  thumbnail       String?
+  level           Level    @default(BEGINNER)
+  category        String
+  price           Float    @default(0)
+  rating          Float    @default(0)
+  totalStudents   Int      @default(0)
+  totalDuration   Int      @default(0) // in minutes
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  instructorId    String
+  instructor      User         @relation("CourseInstructor", fields: [instructorId], references: [id], onDelete: Cascade)
+  enrollments     Enrollment[]
+  videos          Video[]
+  quizzes         Quiz[]
+  progress        Progress[]
+  reviews         Review[]
+  students        User[]       @relation("UserCourses")
+
+  @@map("courses")
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  url         String
+  duration    Int      @default(0) // in seconds
+  order       Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  courseId    String
+  course      Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    Progress[]
+
+  @@map("videos")
+}
+
+model Quiz {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  timeLimit   Int?     // in minutes
+  passingScore Int     @default(70)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  courseId    String
+  course      Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id              String            @id @default(cuid())
+  question        String
+  questionType    QuestionType      @default(MULTIPLE_CHOICE)
+  options         String[]          // JSON array for multiple choice options
+  correctAnswers  String[]          // JSON array for correct answers
+  points          Int               @default(1)
+  order           Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  quizId          String
+  quiz            Quiz              @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers         QuizAnswer[]
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  score       Float    @default(0)
+  totalPoints Int      @default(0)
+  passed      Boolean  @default(false)
+  timeSpent   Int?     // in seconds
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quizId      String
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers     QuizAnswer[]
+
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id        String   @id @default(cuid())
+  answer    String[]  // JSON array for user's answers
+  isCorrect Boolean  @default(false)
+  points    Float    @default(0)
+  createdAt DateTime @default(now())
+
+  // Relations
+  attemptId   String
+  attempt     QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId  String
+  question    QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_answers")
+}
+
+model Enrollment {
+  id              String           @id @default(cuid())
+  enrollmentDate  DateTime         @default(now())
+  completionDate  DateTime?
+  status          EnrollmentStatus @default(ACTIVE)
+  progressPercent Float            @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Progress {
+  id              String   @id @default(cuid())
+  watchedDuration Int      @default(0) // in seconds
+  completed       Boolean  @default(false)
+  lastWatched     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  videoId   String?
+  video     Video? @relation(fields: [videoId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, courseId, videoId])
+  @@map("progress")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5 stars
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("reviews")
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+  ESSAY
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+  CANCELLED
+}
